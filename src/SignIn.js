@@ -30,20 +30,20 @@ class signIn extends React.Component {
             if (!this.state.email.length) {
                 this.setState({ error: 'Please type your email' });
             } else {
-                axios.post('http://localhost:3000/signin', {
+                this.setState({error:''})
+                axios.post('http://localhost:4000/signin', {
                     email: this.state.email,
                     password: this.state.password
                 })
                 .then(response => {
                     const data = response.data;
-                    console.log(data, 'how');
                     if (data.id) {
                         this.props.loadUser(data);
                         this.props.onRouteChange('home');
                     }
                 })
                 .catch(err => {
-                    console.log(err.response, 'hi');
+                    console.log(err, 'hi');
                     
                     if (err.response) {
                         const errorMessage = err.response.data;
@@ -78,8 +78,10 @@ class signIn extends React.Component {
                                     onChange={this.onEmailChange}
                                     className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                                     type="email"
-                                    name="email-address"
-                                    id="email-address" />
+                                    name="email"
+                                    id="email-address"
+                                    autoComplete='email'
+                                    required />
                             </div>
                             <div className="mv3">
                                 <label className="db fw6 lh-copy f6" htmlFor="password">Password</label>
@@ -88,7 +90,8 @@ class signIn extends React.Component {
                                     className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                                     type="password"
                                     name="password"
-                                    id="password" />
+                                    id="password"
+                                    autoComplete='current-password' />
                             </div>
                             {this.state.error ? <p className='db fw6 lh-copy f6'>{this.state.error}</p> : null}
                         </fieldset>

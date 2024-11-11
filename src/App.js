@@ -1,6 +1,8 @@
+/* eslint-disable no-dupe-class-members */
 
 import React, { Component } from 'react';
 import './App.css';
+import axios from 'axios'
 import Navigation from './Navigation';
 // import Clarifai from 'clarifai';
 import Logo from './Logo.js'
@@ -10,18 +12,6 @@ import Rank from './Rank';
 import Register from './Register';
 import SignIn from './SignIn';
 // import Particles from "react-particles-js";
-
-// Your PAT (Personal Access Token) can be found in the portal under Authentification
-const PAT = 'b5215c2b5ce14f329a62d141188c94c7';
-// Specify the correct user_id/app_id pairings
-// Since you're making inferences outside your app's scope
-const USER_ID = 'clarifai';
-const APP_ID = 'main';
-// Change these to whatever model and image URL you want to use
-const MODEL_ID = 'face-detection';
-const MODEL_VERSION_ID = '6dc7e46bc9124c5c8824be4822abe105';
-
-
 
 // const particleOptions = {
 //   "fps_limit": 28,
@@ -93,15 +83,22 @@ class App extends Component {
     super()
     this.state = {
       input: '',
-      ImageUrl: '',
-      box: '',
-      Route: 'signIn'
+      imageUrl: '',
+      box: [],
+      route: 'home',
+      user: {},
+      error: ''
     }
   }
 
+  componentDidMount() { 
+    document.title = "Face Detection"; // Replace with your desired title
+  }
 
-  calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+  calculateFaceLocation = (data, i) => {
+    console.log(i)
+    const clarifaiFace = data.outputs[0].data.regions[i].region_info.bounding_box;
+    console.log(clarifaiFace)
     const image = document.getElementById('input-image');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -114,81 +111,84 @@ class App extends Component {
   }
 
   displayFaceBox = (box) => {
-    this.setState({ box })
+    this.setState(prevState => {
+      return { box: [...prevState.box, box] }
+    })
   }
-
 
   onInput = (event) => {
     this.setState({ input: event.target.value })
   };
 
   onButtonClick = () => {
-    console.log(this.state)
-    this.setState({ ImageUrl: this.state.input });
-    const raw = JSON.stringify({
-      "user_app_id": {
-        "user_id": USER_ID,
-        "app_id": APP_ID
-      },
-      "inputs": [
-        {
-          "data": {
-            "image": {
-              "url": this.state.input
+    this.setState({ imageUrl: this.state.input });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.imageUrl !== this.state.imageUrl) {
+      axios.post("http://localhost:4000/clarifai", { imageUrl: this.state.imageUrl })
+        .then(result => {
+          if (result.data.status.code !== 10000) {
+            console.log('hi')
+            throw new Error(result.data.status.description);
+          }
+          if (result.data.outputs[0].data.regions) {
+            for (let i = 0; i <= result.data.outputs[0].data.regions.length; i++) {
+              console.log(result.data.outputs[0].data.regions)
+
+              this.displayFaceBox(this.calculateFaceLocation(result.data, i))
             }
           }
-        }
-      ]
-    });
+          console.log('error not here')
+          this.setState({ error: '' })
 
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Key ' + PAT
-      },
-      body: raw
-    };
+        })
+        .catch(error => {
 
-    // NOTE: MODEL_VERSION_ID is optional, you can also call prediction with the MODEL_ID only
-    // https://api.clarifai.com/v2/models/{YOUR_MODEL_ID}/outputs
-    // this will default to the latest version_id
+          this.setState({ error: 'Try again or change image url' })
 
-    fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
-      .then(response => response.json())
-      .then(result => {
-        (this.displayFaceBox(this.calculateFaceLocation(result)))
-      })
-      .catch(error => console.log('error', error));
+          console.log(error)
+        });
+
+    }
+
   }
 
   onRouteChange = (route) => {
-    this.setState({ Route: route })
+    this.setState({route})
   }
 
+  removeUser = () => {
+    this.setState({ user: {} })
+  }
+
+  loadUser=(user)=>{
+    this.setState({user})
+  }
   render() {
     return (
       <div>
         {/* <Particles params={particleOptions} /> */}
 
-        <Navigation route={this.state.Route} onRouteChange={this.onRouteChange} />
+        <Navigation route={this.state.Route} removeUser={this.removeUser} onRouteChange={this.onRouteChange} />
         <Logo />
-        
-        {this.state.Route === 'home'
+
+        {this.state.route === 'home'
           ? <div>
-            <Rank />
+            <Rank user={this.state.user.name} entries={this.state.user.entries} />
             <ImageLinkForm
+              error={this.state.error}
               onInputChange={this.onInput}
               onButtonClick={this.onButtonClick}
             />
             <FaceRecogninition
               box={this.state.box}
-              ImageUrl={this.state.ImageUrl}
+              imageUrl={this.state.imageUrl}
             />
           </div>
           : (
-            this.state.Route === 'signIn' ?
-              <SignIn onRouteChange={this.onRouteChange} />
+            this.state.route === 'signIn' ?
+              <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
               :
               <Register onRouteChange={this.onRouteChange} />
           )
