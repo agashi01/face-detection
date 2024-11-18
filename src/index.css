@@ -3,10 +3,15 @@ body {
   padding: 0;
   font-family: sans-serif;
   background: linear-gradient(#e66465, #9198e5) no-repeat;
+  background-attachment: fixed;
+  background-clip: content-box;
+  /* Keep the background fixed during scrolling */
+  /* Ensure the background covers the entire page */
+  /* Center the background */
+  /* Ensure body height extends beyond viewport */
 }
 
 html,
 body {
   height: 100%;
 }
-

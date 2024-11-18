@@ -87,7 +87,9 @@ class App extends Component {
       box: [],
       route: 'home',
       user: {},
-      error: ''
+      error: '',
+      clicked:false
+
     }
   }
 
@@ -121,11 +123,11 @@ class App extends Component {
   };
 
   onButtonClick = () => {
-    this.setState({ imageUrl: this.state.input });
+    this.setState({ clicked:!this.state.clicked,imageUrl: this.state.input });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.imageUrl !== this.state.imageUrl) {
+    if (prevState.imageUrl !== this.state.imageUrl|| prevState.clicked!==this.state.clicked) {
       axios.post("http://localhost:4000/clarifai", { imageUrl: this.state.imageUrl })
         .then(result => {
           if (result.data.status.code !== 10000) {
