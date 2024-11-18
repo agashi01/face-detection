@@ -85,22 +85,22 @@ class App extends Component {
       input: '',
       imageUrl: '',
       box: [],
-      route: 'home',
+      route: 'signIn',
       user: {},
       error: '',
-      clicked:false
+      clicked: false
 
     }
   }
 
-  componentDidMount() { 
+  componentDidMount() {
     document.title = "Face Detection"; // Replace with your desired title
   }
 
   calculateFaceLocation = (data, i) => {
     console.log(i)
     const clarifaiFace = data.outputs[0].data.regions[i].region_info.bounding_box;
-    console.log(clarifaiFace)
+    console.log(data.outputs[0].data.regions[i],'here')
     const image = document.getElementById('input-image');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -123,11 +123,11 @@ class App extends Component {
   };
 
   onButtonClick = () => {
-    this.setState({ clicked:!this.state.clicked,imageUrl: this.state.input });
+    this.setState({ box: [], clicked: !this.state.clicked, imageUrl: this.state.input });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.imageUrl !== this.state.imageUrl|| prevState.clicked!==this.state.clicked) {
+    if (prevState.imageUrl !== this.state.imageUrl || prevState.clicked !== this.state.clicked) {
       axios.post("http://localhost:4000/clarifai", { imageUrl: this.state.imageUrl })
         .then(result => {
           if (result.data.status.code !== 10000) {
@@ -135,7 +135,7 @@ class App extends Component {
             throw new Error(result.data.status.description);
           }
           if (result.data.outputs[0].data.regions) {
-            for (let i = 0; i <= result.data.outputs[0].data.regions.length; i++) {
+            for (let i = 0; i < result.data.outputs[0].data.regions.length; i++) {
               console.log(result.data.outputs[0].data.regions)
 
               this.displayFaceBox(this.calculateFaceLocation(result.data, i))
@@ -157,15 +157,15 @@ class App extends Component {
   }
 
   onRouteChange = (route) => {
-    this.setState({route})
+    this.setState({ route })
   }
 
   removeUser = () => {
     this.setState({ user: {} })
   }
 
-  loadUser=(user)=>{
-    this.setState({user})
+  loadUser = (user) => {
+    this.setState({ user })
   }
   render() {
     return (
