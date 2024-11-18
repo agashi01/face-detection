@@ -98,9 +98,7 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data, i) => {
-    console.log(i)
     const clarifaiFace = data.outputs[0].data.regions[i].region_info.bounding_box;
-    console.log(data.outputs[0].data.regions[i],'here')
     const image = document.getElementById('input-image');
     const width = Number(image.width);
     const height = Number(image.height);
@@ -128,20 +126,17 @@ class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.imageUrl !== this.state.imageUrl || prevState.clicked !== this.state.clicked) {
-      axios.post("http://localhost:4000/clarifai", { imageUrl: this.state.imageUrl })
+      axios.post("https://face-recognition-backend-agashi01.onrender.com/clarifai", { imageUrl: this.state.imageUrl })
         .then(result => {
           if (result.data.status.code !== 10000) {
-            console.log('hi')
             throw new Error(result.data.status.description);
           }
           if (result.data.outputs[0].data.regions) {
             for (let i = 0; i < result.data.outputs[0].data.regions.length; i++) {
-              console.log(result.data.outputs[0].data.regions)
 
               this.displayFaceBox(this.calculateFaceLocation(result.data, i))
             }
           }
-          console.log('error not here')
           this.setState({ error: '' })
 
         })

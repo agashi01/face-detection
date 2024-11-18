@@ -64,7 +64,7 @@ class register extends React.Component {
 		e.preventDefault()
 		if (!(this.handleName() || this.handleEmail() || this.handlePassword())) {
 
-			axios.post('http://localhost:4000/register', {
+			axios.post('https://face-recognition-backend-agashi01.onrender.com/register', {
 				name: this.state.registerName.toLowerCase(),
 				email: this.state.registerEmail,
 				password: this.state.registerPassword
