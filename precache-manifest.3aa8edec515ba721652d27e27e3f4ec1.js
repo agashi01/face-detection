@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/face-detection/static/js/runtime~main.ec3d4b07.js"
   },
   {
-    "revision": "0c0acc62c5a7132459d84ed2ea113cd9",
+    "revision": "d90c2ff75ef72593c3bd556100113b29",
     "url": "/face-detection/index.html"
   }
 ];
