@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "b75414db434b0722c64f",
+    "revision": "f08997a03a2c09660a5f",
     "url": "/face-detection/static/css/main.2957a521.chunk.css"
   },
   {
-    "revision": "b75414db434b0722c64f",
-    "url": "/face-detection/static/js/main.b75414db.chunk.js"
+    "revision": "f08997a03a2c09660a5f",
+    "url": "/face-detection/static/js/main.f08997a0.chunk.js"
   },
   {
     "revision": "827259e7aa3f2710c876",
@@ -24,7 +24,7 @@ self.__precacheManifest = [
     "url": "/face-detection/static/media/brain.a39229c4.webp"
   },
   {
-    "revision": "f4182c1ed4573119f4f92a261591f2d8",
+    "revision": "86464412ab979cd8f5647180580b84f3",
     "url": "/face-detection/index.html"
   }
 ];
